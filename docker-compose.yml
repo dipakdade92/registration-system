@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+
+  # MongoDB
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    command: mongod
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  # Django
+  django:
+    build: .
+    container_name: django
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./:/app
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - MONGO_DB_HOST=mongodb
+      - MONGO_DB_PORT=27017
+      - MONGO_DB_USER=root
+      - MONGO_DB_PASS=example
+
+# # Node.js
